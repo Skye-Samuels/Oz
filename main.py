@@ -66,6 +66,11 @@ def display_help():
     • search [query] [num] : Search the web.
              [query] : The search term (e.g., "Python programming").
                      [num] : Number of results (max 10, default 5).
+    
+    • history : View your past searches.
+
+    • open [number] : Open a past search result.
+           [number] : The result index from history (e.g., "open 2").
 
     • define [word] : Get the definition of a word.
              [word] : Any valid English word.
@@ -85,11 +90,6 @@ def display_help():
                [location] : City or region name (e.g., "Los Angeles").
 
     • back : Repeat the last command.
-
-    • history : View your past searches.
-
-    • open [number] : Open a past search result.
-           [number] : The result index from history (e.g., "open 2").
 
     • exit (or 'q') : Close the application.
 
@@ -566,7 +566,7 @@ def show_main_menu():
     clear_screen()
     
     print_banner()
-    
+
     print("""
     ╔══════════════════════════════════════════════════════════════════════════╗
     ║                              MAIN MENU                                   ║
@@ -580,6 +580,8 @@ def show_main_menu():
     
     • Type 'help' (or '?')        ─ View instructions and available commands.
     • Type 'search [query] [num]' ─ Search the web for [num] search results.
+    • Type 'history'              ─ View your search history.
+    • Type 'open [number]'        ─ Simulate opening a link.
     • Type 'define [word]'        ─ Get the definition of a word.
     • Type 'synonyms [word]'      ─ Get synonyms for a word.
     • Type 'antonyms [word]'      ─ Get antonyms for a word.
@@ -587,8 +589,6 @@ def show_main_menu():
     • Type 'weather [location]'   ─ Get the current weather for a location.
     • Type 'forecast [location]'  ─ Get a 3-day weather forecast.
     • Type 'back'                 ─ Repeat the last command.
-    • Type 'history'              ─ View your search history.
-    • Type 'open [number]'        ─ Simulate opening a link.
     • Type 'exit' (or 'q')        ─ Close the application.
 
     ╔══════════════════════════════════════════════════════════════════════════╗
