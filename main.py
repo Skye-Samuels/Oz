@@ -10,7 +10,7 @@ search_history = []
 
 
 def clear_screen():
-    """Clears the console screen."""
+
     os.system('cls' if os.name == 'nt' else 'clear')
 
 
@@ -28,7 +28,7 @@ def print_banner():
 
 
 def first_time_message():
-    """Displays a creative welcome message and waits for user input before continuing."""
+
     clear_screen()
     print("""
     ╔══════════════════════════════════════════════════════════════════════════╗
@@ -65,8 +65,12 @@ def display_help():
 
     ●  search [query] [number]
        ─ Performs a web search and displays results.
-       ─ [number] is between 1 -> 10, 5 is defualt.
+       ─ [number] is between 1 -> 10, 5 is default.
        ─ Example: 'search python 10' (returns top 10 results).
+
+    ●  joke
+       ─ Fetches a random joke from an external joke service.
+       ─ Example: 'joke' (returns a joke setup and punchline).
 
     ●  back
        ─ Repeats the last command.
@@ -89,6 +93,7 @@ def display_help():
     ╚══════════════════════════════════════════════════════════════════════════╝
     """)
     input()
+
 
 def search_web(query, num_results=5):
 
@@ -170,9 +175,51 @@ def open_link(number):
             print(f"    🔍 Re-searching for: {query}")
             search_web(query)
         else:
-            print("    ⚠️ Invalid link number.")
+            input("    ⚠️ Invalid link number.")
     except (ValueError, IndexError):
-        print("    ⚠️ Please enter a valid number.")
+        input("    ⚠️ Please enter a valid number.")
+
+
+def fetch_random_joke():
+
+    global previous_command
+    previous_command = "joke"
+
+    clear_screen()
+    print_banner()
+    print("\n    🎭 Fetching a random joke...\n")
+
+    joke_url = "http://localhost:8008/getRandomJoke"
+
+    try:
+        response = requests.get(joke_url, timeout=5)
+        response.raise_for_status()
+
+        joke_data = response.json()
+        setup = joke_data.get("setup", "No setup available.")
+        punchline = joke_data.get("punchline", "No punchline available.")
+
+        print(f"    🤡 {setup}")
+        print(f"    😂 {punchline}")
+
+    except requests.exceptions.ConnectionError:
+        print("    ❌ Unable to connect to the joke server.")
+        print("    🔹 Please ensure the joke microservice is running on port 8008.")
+
+    except requests.exceptions.Timeout:
+        print("    ❌ The request timed out.")
+        print("    🔹 The joke server is taking too long to respond. Try again later.")
+
+    except requests.exceptions.HTTPError as http_err:
+        print(f"    ❌ HTTP Error: {http_err}")
+        print("    🔹 The joke service might be experiencing issues.")
+
+    except requests.RequestException as e:
+        print(f"    ❌ An unexpected error occurred: {e}")
+        print("    🔹 Please check your internet connection or try again later.")
+
+    input("\n    🔹 Press Enter to return to the main menu...")
+
 
 
 def show_main_menu():
@@ -192,6 +239,7 @@ def show_main_menu():
     
     • Type 'help' (or '?')        ─ View instructions and available commands.
     • Type 'search [query] [num]' ─ Search the web for [num] search results.
+    • Type 'joke'                 ─ Get a random joke from an external service.
     • Type 'back'                 ─ Repeat the last command.
     • Type 'history'              ─ View your search history.
     • Type 'open [number]'        ─ Simulate opening a link.
@@ -225,7 +273,7 @@ def handle_command(user_input):
         if previous_command and previous_command != "back":
             handle_command(previous_command)
         else:
-            print("    ⚠️ No previous command to repeat.")
+            input("    ⚠️ No previous command to repeat.")
 
     elif user_input == "history":
         show_history()
@@ -234,13 +282,15 @@ def handle_command(user_input):
         number = user_input.split()[1]
         open_link(number)
 
+    elif user_input == "joke":
+        fetch_random_joke()
+
     elif user_input == "exit" or user_input == "q":
         confirm = input("\n    ❓ Are you sure you want to exit? (yes/no): ").strip().lower()
         if confirm in ["yes", "y"]:
             sys.exit("\n    🔹 Goodbye!\n")
     else:
-        print("    ⚠️ Invalid command. Type 'help' for a list of commands.")
-
+        input("    ⚠️ Invalid command. Type 'help' for a list of commands.")
 
 
 def main():
