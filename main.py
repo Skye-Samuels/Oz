@@ -44,7 +44,9 @@ def first_time_message():
 
 
 def display_help():
+
     global previous_command
+
     previous_command = "help"
 
     clear_screen()
@@ -59,15 +61,37 @@ def display_help():
     ────────────────────────────────────────────────────────────────────────────
                                    COMMANDS
     ────────────────────────────────────────────────────────────────────────────
-    • Type 'help' (or '?')        ─ View instructions and available commands.
-    • Type 'search [query] [num]' ─ Search the web for [num] search results.
-    • Type 'joke'                 ─ Get a random joke from an external service.
-    • Type 'weather [location]'   ─ Get the current weather for a location.
-    • Type 'forecast [location]'  ─ Get a 3-day weather forecast.
-    • Type 'back'                 ─ Repeat the last command.
-    • Type 'history'              ─ View your search history.
-    • Type 'open [number]'        ─ Simulate opening a link.
-    • Type 'exit' (or 'q')        ─ Close the application.
+    • help (or '?') : View available commands.
+
+    • search [query] [num] : Search the web.
+             [query] : The search term (e.g., "Python programming").
+                     [num] : Number of results (max 10, default 5).
+
+    • define [word] : Get the definition of a word.
+             [word] : Any valid English word.
+
+    • synonyms [word] : Get synonyms for a word.
+               [word] : Any valid English word.
+
+    • antonyms [word] : Get antonyms for a word.
+               [word] : Any valid English word.
+
+    • joke : Get a random joke.
+
+    • weather [location] : Get the current weather.
+              [location] : City or region name (e.g., "New York").
+
+    • forecast [location] : Get a 3-day weather forecast.
+               [location] : City or region name (e.g., "Los Angeles").
+
+    • back : Repeat the last command.
+
+    • history : View your past searches.
+
+    • open [number] : Open a past search result.
+           [number] : The result index from history (e.g., "open 2").
+
+    • exit (or 'q') : Close the application.
 
     ────────────────────────────────────────────────────────────────────────────
     PRIVACY NOTICE:
@@ -234,7 +258,9 @@ def fetch_weather_data(location, forecast=False):
 
 
 def fetch_current_weather(location):
+
     global previous_command
+
     previous_command = f"weather {location}"
 
     clear_screen()
@@ -270,7 +296,9 @@ def fetch_current_weather(location):
 
 
 def fetch_current_weather(location):
+
     global previous_command
+
     previous_command = f"weather {location}"
 
     clear_screen()
@@ -303,7 +331,9 @@ def fetch_current_weather(location):
 
 
 def fetch_weather_forecast(location):
+
     global previous_command
+
     previous_command = f"forecast {location}"
 
     clear_screen()
@@ -339,9 +369,204 @@ def fetch_weather_forecast(location):
     ''')
 
 
-def show_main_menu():
+def fetch_word_definition(word):
+
+    base_url = "http://localhost:8010/define"
+    url = f"{base_url}/{word}"
+
+    try:
+        response = requests.get(url, timeout=5)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.ConnectionError:
+        return {"error": "Unable to connect to the dictionary service. Ensure it is running on port 8010."}
+    except requests.exceptions.Timeout:
+        return {"error": "The request to the dictionary service timed out. Try again later."}
+    except requests.exceptions.HTTPError as http_err:
+        return {"error": f"HTTP Error: {http_err}"}
+    except requests.RequestException as e:
+        return {"error": f"An unexpected error occurred: {e}"}
+
+
+def fetch_word_synonyms(word):
+
+    base_url = "http://localhost:8010/synonyms"
+    url = f"{base_url}/{word}"
+
+    try:
+        response = requests.get(url, timeout=5)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.ConnectionError:
+        return {"error": "Unable to connect to the dictionary service. Ensure it is running on port 8010."}
+    except requests.exceptions.Timeout:
+        return {"error": "The request to the dictionary service timed out. Try again later."}
+    except requests.exceptions.HTTPError as http_err:
+        return {"error": f"HTTP Error: {http_err}"}
+    except requests.RequestException as e:
+        return {"error": f"An unexpected error occurred: {e}"}
+
+
+def fetch_word_antonyms(word):
+
+    base_url = "http://localhost:8010/antonyms"
+    url = f"{base_url}/{word}"
+
+    try:
+        response = requests.get(url, timeout=5)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.ConnectionError:
+        return {"error": "Unable to connect to the dictionary service. Ensure it is running on port 8010."}
+    except requests.exceptions.Timeout:
+        return {"error": "The request to the dictionary service timed out. Try again later."}
+    except requests.exceptions.HTTPError as http_err:
+        return {"error": f"HTTP Error: {http_err}"}
+    except requests.RequestException as e:
+        return {"error": f"An unexpected error occurred: {e}"}
+
+
+def define_word(word):
+
+    global previous_command
+
+    previous_command = f"define {word}"
+
     clear_screen()
     print_banner()
+
+    if not word.strip():
+        print("\n    ❌ Error: Word cannot be empty.\n")
+        input("    🔹 Press Enter to return to the main menu...")
+        return
+
+    print(f"\n    ⏳ Fetching definition for: {word}...\n")
+
+    definition_data = fetch_word_definition(word)
+
+    if "error" in definition_data:
+        print(f"\n    ❌ {definition_data['error']}\n")
+    else:
+        print("    ╔══════════════════════════════════════════════════════════════════════════╗")
+        print("    ║                          📖 WORD DEFINITION                              ║")
+        print("    ╚══════════════════════════════════════════════════════════════════════════╝\n")
+        print(f"    📝 Word: {definition_data['word']}\n")
+
+        displayed = 0
+        for meaning in definition_data["meanings"]:
+            if displayed >= 5:
+                break
+
+            part_of_speech = meaning["part_of_speech"].capitalize()
+            definition = meaning["definition"].strip()
+
+            if not definition or definition in [":", "-"]:
+                continue  
+
+            print(f"    🔹 {part_of_speech}: {definition}\n")
+
+            example = meaning.get("example", "").strip()
+            if example and example.lower() != "no example available":
+                print(f"    ✍️  Example: {example}\n")
+
+            displayed += 1
+
+    input('''
+    ╔══════════════════════════════════════════════════════════════════════════╗
+    ║ Press Enter to return to the main menu...                                ║
+    ╚══════════════════════════════════════════════════════════════════════════╝
+    ''')
+
+
+def get_synonyms(word):
+
+    global previous_command
+
+    previous_command = f"synonyms {word}"
+
+    clear_screen()
+    print_banner()
+
+    if not word.strip():
+        print("\n    ❌ Error: Word cannot be empty.\n")
+        input("    🔹 Press Enter to return to the main menu...")
+        return
+
+    print(f"\n    ⏳ Fetching synonyms for: {word}...\n")
+
+    synonym_data = fetch_word_synonyms(word)
+
+    if "error" in synonym_data:
+        print(f"\n    ❌ {synonym_data['error']}\n")
+    else:
+        print("    ╔══════════════════════════════════════════════════════════════════════════╗")
+        print("    ║                            🔄 SYNONYMS LIST                              ║")
+        print("    ╚══════════════════════════════════════════════════════════════════════════╝\n")
+        print(f"    📝 Word: {synonym_data['word']}\n")
+
+        synonyms = synonym_data.get("synonyms", [])
+        if not synonyms or synonyms == ["No synonyms found"]:
+            print("    ❌ No synonyms found.\n")
+        else:
+            print("    🔹 Synonyms:\n")
+            for synonym in synonyms[:5]:  
+                print(f"      - {synonym}")
+
+    input('''
+    ╔══════════════════════════════════════════════════════════════════════════╗
+    ║ Press Enter to return to the main menu...                                ║
+    ╚══════════════════════════════════════════════════════════════════════════╝
+    ''')
+
+
+def get_antonyms(word):
+
+    global previous_command
+
+    previous_command = f"antonyms {word}"
+
+    clear_screen()
+    print_banner()
+
+    if not word.strip():
+        print("\n    ❌ Error: Word cannot be empty.\n")
+        input("    🔹 Press Enter to return to the main menu...")
+        return
+
+    print(f"\n    ⏳ Fetching antonyms for: {word}...\n")
+
+    antonym_data = fetch_word_antonyms(word)
+
+    if "error" in antonym_data:
+        print(f"\n    ❌ {antonym_data['error']}\n")
+    else:
+        print("    ╔══════════════════════════════════════════════════════════════════════════╗")
+        print("    ║                            🔄 ANTONYMS LIST                              ║")
+        print("    ╚══════════════════════════════════════════════════════════════════════════╝\n")
+        print(f"    📝 Word: {antonym_data['word']}\n")
+
+        antonyms = antonym_data["antonyms"]
+        if antonyms == ["No antonyms found"]:
+            print("    ❌ No antonyms found for this word.\n")
+        else:
+            formatted_antonyms = ", ".join(antonyms[:10])
+            print("    🔹 Antonyms:\n")
+            for antonym in antonyms[:5]:  
+                print(f"      - {antonym}")
+
+    input('''
+    ╔══════════════════════════════════════════════════════════════════════════╗
+    ║ Press Enter to return to the main menu...                                ║
+    ╚══════════════════════════════════════════════════════════════════════════╝
+    ''')
+
+
+def show_main_menu():
+
+    clear_screen()
+    
+    print_banner()
+    
     print("""
     ╔══════════════════════════════════════════════════════════════════════════╗
     ║                              MAIN MENU                                   ║
@@ -355,6 +580,9 @@ def show_main_menu():
     
     • Type 'help' (or '?')        ─ View instructions and available commands.
     • Type 'search [query] [num]' ─ Search the web for [num] search results.
+    • Type 'define [word]'        ─ Get the definition of a word.
+    • Type 'synonyms [word]'      ─ Get synonyms for a word.
+    • Type 'antonyms [word]'      ─ Get antonyms for a word.
     • Type 'joke'                 ─ Get a random joke from an external service.
     • Type 'weather [location]'   ─ Get the current weather for a location.
     • Type 'forecast [location]'  ─ Get a 3-day weather forecast.
@@ -370,6 +598,7 @@ def show_main_menu():
 
 
 def handle_command(user_input):
+
     global previous_command
 
     if user_input == "help" or user_input == "?":
@@ -407,13 +636,30 @@ def handle_command(user_input):
             fetch_weather_forecast(location)
         else:
             input("    ⚠️ Please specify a location. Example: forecast London")
+    elif user_input.startswith("define "):
+        word = user_input.split(" ", 1)[1] if len(user_input.split(" ", 1)) > 1 else ""
+        if word:
+            define_word(word)
+        else:
+            input("    ⚠️ Please specify a word. Example: define test")
+    elif user_input.startswith("synonyms "):
+        word = user_input.split(" ", 1)[1] if len(user_input.split(" ", 1)) > 1 else ""
+        if word:
+            get_synonyms(word)
+        else:
+            input("    ⚠️ Please specify a word. Example: synonyms happy")
+    elif user_input.startswith("antonyms "):
+        word = user_input.split(" ", 1)[1] if len(user_input.split(" ", 1)) > 1 else ""
+        if word:
+            get_antonyms(word)
+        else:
+            input("    ⚠️ Please specify a word. Example: antonyms good")
     elif user_input == "exit" or user_input == "q":
         confirm = input("\n    ❓ Are you sure you want to exit? (yes/no): ").strip().lower()
         if confirm in ["yes", "y"]:
             sys.exit("\n    🔹 Goodbye!\n")
     else:
         input("    ⚠️ Invalid command. Type 'help' for a list of commands.")
-
 
 
 def main():
