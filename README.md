@@ -1,4 +1,7 @@
 Remember to run micoroservices with OZ!
 
-joke service    - https://github.com/rjmags1/joke-generator-microservice
-weather service - https://github.com/Skye-Samuels/weather-information-microservice
+[Joke Service](https://github.com/rjmags1/joke-generator-microservice)
+
+[Weather Service](https://github.com/Skye-Samuels/weather-information-microservice)
+
+[Dictionary/Thesaurus Service](https://github.com/Skye-Samuels/dictionary-thesaurus-microservice)
