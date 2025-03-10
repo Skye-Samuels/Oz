@@ -44,7 +44,6 @@ def first_time_message():
 
 
 def display_help():
-
     global previous_command
     previous_command = "help"
 
@@ -60,33 +59,19 @@ def display_help():
     ────────────────────────────────────────────────────────────────────────────
                                    COMMANDS
     ────────────────────────────────────────────────────────────────────────────
-    ●  help (or ?)
-       ─ Displays this help menu.
-
-    ●  search [query] [number]
-       ─ Performs a web search and displays results.
-       ─ [number] is between 1 -> 10, 5 is default.
-       ─ Example: 'search python 10' (returns top 10 results).
-
-    ●  joke
-       ─ Fetches a random joke from an external joke service.
-       ─ Example: 'joke' (returns a joke setup and punchline).
-
-    ●  back
-       ─ Repeats the last command.
-
-    ●  history
-       ─ Displays past search queries.
-
-    ●  open [number]
-       ─ Opens the URL of the specified search result in your browser.
-
-    ●  exit (or q)
-       ─ Closes the application.
+    • Type 'help' (or '?')        ─ View instructions and available commands.
+    • Type 'search [query] [num]' ─ Search the web for [num] search results.
+    • Type 'joke'                 ─ Get a random joke from an external service.
+    • Type 'weather [location]'   ─ Get the current weather for a location.
+    • Type 'forecast [location]'  ─ Get a 3-day weather forecast.
+    • Type 'back'                 ─ Repeat the last command.
+    • Type 'history'              ─ View your search history.
+    • Type 'open [number]'        ─ Simulate opening a link.
+    • Type 'exit' (or 'q')        ─ Close the application.
 
     ────────────────────────────────────────────────────────────────────────────
     PRIVACY NOTICE:
-    ● Oz Assistant does NOT store search history beyond the current session.
+    • Oz Assistant does NOT store search history beyond the current session.
 
     ╔══════════════════════════════════════════════════════════════════════════╗
     ║ Press Enter to return to the main menu...                                ║
@@ -199,7 +184,7 @@ def fetch_random_joke():
         setup = joke_data.get("setup", "No setup available.")
         punchline = joke_data.get("punchline", "No punchline available.")
 
-        print(f"    🤡 {setup}")
+        print(f"    🤡 {setup}\n")
         print(f"    😂 {punchline}")
 
     except requests.exceptions.ConnectionError:
@@ -218,12 +203,143 @@ def fetch_random_joke():
         print(f"    ❌ An unexpected error occurred: {e}")
         print("    🔹 Please check your internet connection or try again later.")
 
-    input("\n    🔹 Press Enter to return to the main menu...")
+    input('''
+    ╔══════════════════════════════════════════════════════════════════════════╗
+    ║ Press Enter to return to the main menu...                                ║
+    ╚══════════════════════════════════════════════════════════════════════════╝
+    ''')
 
+
+def fetch_weather_data(location, forecast=False):
+    base_url = "http://localhost:8009"
+    endpoint = "/forecast" if forecast else "/current_weather"
+    url = f"{base_url}{endpoint}?location={urllib.parse.quote(location)}"
+
+    try:
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+        return response.json()
+
+    except requests.exceptions.ConnectionError:
+        return {"error": "Unable to connect to the weather server. Ensure the weather microservice is running on port 8009."}
+
+    except requests.exceptions.Timeout:
+        return {"error": "The request to the weather server timed out. Try again later."}
+
+    except requests.exceptions.HTTPError as http_err:
+        return {"error": f"HTTP Error: {http_err}"}
+
+    except requests.RequestException as e:
+        return {"error": f"An unexpected error occurred: {e}"}
+
+
+def fetch_current_weather(location):
+    global previous_command
+    previous_command = f"weather {location}"
+
+    clear_screen()
+    print_banner()
+
+    if not location.strip():
+        print("\n    ❌ Error: Location cannot be empty.")
+        input("\n    🔹 Press Enter to return to the main menu...")
+        return
+
+    print(f"\n    ⏳ Gathering weather insights for {location}...\n")
+    weather_data = fetch_weather_data(location)
+
+    if "error" in weather_data:
+        print(f"\n    ❌ {weather_data['error']}")
+    else:
+        weather_icon = get_weather_icon(weather_data["weather_condition"])
+        print("    ╔══════════════════════════════════════════════════════════════════════════╗")
+        print("    ║                            🌎 CURRENT WEATHER                           ║")
+        print("    ╚══════════════════════════════════════════════════════════════════════════╝")
+        print(f"    📍 Location: {weather_data['location']}")
+        print(f"    {weather_icon}")
+        print(f"    🌡 Temperature: {weather_data['temperature_C']}°C / {weather_data['temperature_F']}°F")
+        print(f"    💧 Humidity: {weather_data['humidity']}%")
+        print(f"    ⛅ Condition: {weather_data['weather_condition']}")
+        print("    ═══════════════════════════════════════════════════════════════════════════")
+
+    input('''
+    ╔══════════════════════════════════════════════════════════════════════════╗
+    ║ Press Enter to return to the main menu...                                ║
+    ╚══════════════════════════════════════════════════════════════════════════╝
+    ''')
+
+
+def fetch_current_weather(location):
+    global previous_command
+    previous_command = f"weather {location}"
+
+    clear_screen()
+    print_banner()
+
+    if not location.strip():
+        print("\n    ❌ Error: Location cannot be empty.")
+        input("\n    🔹 Press Enter to return to the main menu...")
+        return
+
+    print(f"\n    ⏳ Retrieving current weather for {location}...\n")
+    weather_data = fetch_weather_data(location)
+
+    if "error" in weather_data:
+        print(f"\n    ❌ {weather_data['error']}")
+    else:
+        print("    ╔══════════════════════════════════════════════════════════════════════════╗")
+        print("    ║                          🌎 CURRENT WEATHER                              ║")
+        print("    ╚══════════════════════════════════════════════════════════════════════════╝\n")
+        print(f"    📍 Location: {weather_data['location']}")
+        print(f"    🌡 Temperature: {weather_data['temperature_C']}°C / {weather_data['temperature_F']}°F")
+        print(f"    💧 Humidity: {weather_data['humidity']}%")
+        print(f"    ⛅ Condition: {weather_data['weather_condition']}")
+
+    input('''
+    ╔══════════════════════════════════════════════════════════════════════════╗
+    ║ Press Enter to return to the main menu...                                ║
+    ╚══════════════════════════════════════════════════════════════════════════╝
+    ''')
+
+
+def fetch_weather_forecast(location):
+    global previous_command
+    previous_command = f"forecast {location}"
+
+    clear_screen()
+    print_banner()
+
+    if not location.strip():
+        print("\n    ❌ Error: Location cannot be empty.")
+        input("\n    🔹 Press Enter to return to the main menu...")
+        return
+
+    print(f"\n    ⏳ Fetching 3-day forecast for {location}...\n")
+    forecast_data = fetch_weather_data(location, forecast=True)
+
+    if "error" in forecast_data:
+        print(f"\n    ❌ {forecast_data['error']}")
+    else:
+        print("    ╔══════════════════════════════════════════════════════════════════════════╗")
+        print("    ║                         📅 3-DAY WEATHER FORECAST                        ║")
+        print("    ╚══════════════════════════════════════════════════════════════════════════╝\n")
+        print(f"    📍 Location: {forecast_data['location']}")
+
+        for day in forecast_data["forecast"]:
+            print("\n    ───────────────────────────────────────────────────────────────────────────\n")
+            print(f"    📅 Date: {day['date']}")
+            print(f"    🌡 Max Temp: {day['temperature_max_C']}°C / {day['temperature_max_F']}°F")
+            print(f"    🌡 Min Temp: {day['temperature_min_C']}°C / {day['temperature_min_F']}°F")
+            print(f"    ⛅ Condition: {day['weather_condition']}")
+
+    input('''
+    ╔══════════════════════════════════════════════════════════════════════════╗
+    ║ Press Enter to return to the main menu...                                ║
+    ╚══════════════════════════════════════════════════════════════════════════╝
+    ''')
 
 
 def show_main_menu():
-
     clear_screen()
     print_banner()
     print("""
@@ -234,12 +350,14 @@ def show_main_menu():
     Welcome to Oz! Your personal assistant for fast information retrieval.
 
     ────────────────────────────────────────────────────────────────────────────
-    AVAILABLE COMMANDS:
+                              AVAILABLE COMMANDS
     ────────────────────────────────────────────────────────────────────────────
     
     • Type 'help' (or '?')        ─ View instructions and available commands.
     • Type 'search [query] [num]' ─ Search the web for [num] search results.
     • Type 'joke'                 ─ Get a random joke from an external service.
+    • Type 'weather [location]'   ─ Get the current weather for a location.
+    • Type 'forecast [location]'  ─ Get a 3-day weather forecast.
     • Type 'back'                 ─ Repeat the last command.
     • Type 'history'              ─ View your search history.
     • Type 'open [number]'        ─ Simulate opening a link.
@@ -252,7 +370,6 @@ def show_main_menu():
 
 
 def handle_command(user_input):
-
     global previous_command
 
     if user_input == "help" or user_input == "?":
@@ -261,36 +378,42 @@ def handle_command(user_input):
         previous_command = user_input
         parts = user_input.split(" ")
         search_query = " ".join(parts[1:])
-
         num_results = 5
         if search_query.split()[-1].isdigit():
             num_results = int(search_query.split()[-1])
             search_query = " ".join(search_query.split()[:-1])
-
         search_web(search_query, num_results)
-
     elif user_input == "back":
         if previous_command and previous_command != "back":
             handle_command(previous_command)
         else:
             input("    ⚠️ No previous command to repeat.")
-
     elif user_input == "history":
         show_history()
-
     elif user_input.startswith("open "):
         number = user_input.split()[1]
         open_link(number)
-
     elif user_input == "joke":
         fetch_random_joke()
-
+    elif user_input.startswith("weather "):
+        location = user_input.split(" ", 1)[1] if len(user_input.split(" ", 1)) > 1 else ""
+        if location:
+            fetch_current_weather(location)
+        else:
+            input("    ⚠️ Please specify a location. Example: weather London")
+    elif user_input.startswith("forecast "):
+        location = user_input.split(" ", 1)[1] if len(user_input.split(" ", 1)) > 1 else ""
+        if location:
+            fetch_weather_forecast(location)
+        else:
+            input("    ⚠️ Please specify a location. Example: forecast London")
     elif user_input == "exit" or user_input == "q":
         confirm = input("\n    ❓ Are you sure you want to exit? (yes/no): ").strip().lower()
         if confirm in ["yes", "y"]:
             sys.exit("\n    🔹 Goodbye!\n")
     else:
         input("    ⚠️ Invalid command. Type 'help' for a list of commands.")
+
 
 
 def main():
