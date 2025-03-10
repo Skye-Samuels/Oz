@@ -279,7 +279,7 @@ def fetch_current_weather(location):
     else:
         weather_icon = get_weather_icon(weather_data["weather_condition"])
         print("    ╔══════════════════════════════════════════════════════════════════════════╗")
-        print("    ║                            🌎 CURRENT WEATHER                           ║")
+        print("    ║                            🌎 CURRENT WEATHER                            ║")
         print("    ╚══════════════════════════════════════════════════════════════════════════╝")
         print(f"    📍 Location: {weather_data['location']}")
         print(f"    {weather_icon}")
