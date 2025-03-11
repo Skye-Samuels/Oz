@@ -5,6 +5,12 @@ from bs4 import BeautifulSoup
 import urllib.parse
 import webbrowser
 
+WEB_BASE_URL = "https://www.duckduckgo.com"
+JOKE_BASE_URL = "http://localhost:8008"
+WEATHER_BASE_URL = "http://localhost:8009"
+WORDS_BASE_URL = "http://localhost:8010"
+TODO_BASE_URL = "http://localhost:8011"
+
 previous_command = ""
 search_history = []
 
@@ -117,7 +123,7 @@ def search_web(query, num_results=5):
     if query not in search_history:
         search_history.append(query)
 
-    search_url = f"https://www.duckduckgo.com/html/?q={urllib.parse.quote(query)}"
+    search_url = f"{WEB_BASE_URL}/html/?q={urllib.parse.quote(query)}"
     headers = {"User-Agent": "Mozilla/5.0"}
 
     try:
@@ -198,7 +204,7 @@ def fetch_random_joke():
     print_banner()
     print("\n    🎭 Fetching a random joke...\n")
 
-    joke_url = "http://localhost:8008/getRandomJoke"
+    joke_url = f"{JOKE_BASE_URL}/getRandomJoke"
 
     try:
         response = requests.get(joke_url, timeout=5)
@@ -235,9 +241,9 @@ def fetch_random_joke():
 
 
 def fetch_weather_data(location, forecast=False):
-    base_url = "http://localhost:8009"
+
     endpoint = "/forecast" if forecast else "/current_weather"
-    url = f"{base_url}{endpoint}?location={urllib.parse.quote(location)}"
+    url = f"{WEATHER_BASE_URL}{endpoint}?location={urllib.parse.quote(location)}"
 
     try:
         response = requests.get(url, timeout=10)
@@ -371,8 +377,8 @@ def fetch_weather_forecast(location):
 
 def fetch_word_definition(word):
 
-    base_url = "http://localhost:8010/define"
-    url = f"{base_url}/{word}"
+    definition_url = f"{WORDS_BASE_URL}/define"
+    url = f"{definition_url}/{word}"
 
     try:
         response = requests.get(url, timeout=5)
@@ -390,8 +396,8 @@ def fetch_word_definition(word):
 
 def fetch_word_synonyms(word):
 
-    base_url = "http://localhost:8010/synonyms"
-    url = f"{base_url}/{word}"
+    synonyms_url = f"{WORDS_BASE_URL}/synonyms"
+    url = f"{synonyms_url}/{word}"
 
     try:
         response = requests.get(url, timeout=5)
@@ -409,8 +415,8 @@ def fetch_word_synonyms(word):
 
 def fetch_word_antonyms(word):
 
-    base_url = "http://localhost:8010/antonyms"
-    url = f"{base_url}/{word}"
+    antonyms_url = f"{WORDS_BASE_URL}/antonyms"
+    url = f"{antonyms_url}/{word}"
 
     try:
         response = requests.get(url, timeout=5)
@@ -559,6 +565,47 @@ def get_antonyms(word):
     ║ Press Enter to return to the main menu...                                ║
     ╚══════════════════════════════════════════════════════════════════════════╝
     ''')
+
+
+def add_task(task):
+
+    global previous_command
+    
+    previous_command = f"add {task}"
+
+    clear_screen()
+    print_banner()
+
+    if not task.strip():
+        print("\n    ❌ Error: Task description cannot be empty.\n")
+        input("    🔹 Press Enter to return to the main menu...")
+        return
+
+    print(f"\n    ⏳ Adding task: {task}...\n")
+
+    try:
+        response = requests.post(f"{TODO_BASE_URL}/todo/add", json={"task": task})
+        response.raise_for_status()
+
+        print("    ✅ Task added successfully!\n")
+
+    except requests.exceptions.ConnectionError:
+        print("    ❌ Unable to connect to the To-Do service.")
+        print("    🔹 Please ensure the service is running on port 8011.")
+
+    except requests.exceptions.Timeout:
+        print("    ❌ The request timed out.")
+        print("    🔹 The To-Do service is taking too long to respond. Try again later.")
+
+    except requests.exceptions.HTTPError as http_err:
+        print(f"    ❌ HTTP Error: {http_err}")
+        print("    🔹 The To-Do service might be experiencing issues.")
+
+    except requests.RequestException as e:
+        print(f"    ❌ An unexpected error occurred: {e}")
+        print("    🔹 Please check your connection and try again.")
+
+    input("\n    🔹 Press Enter to return to the main menu...")
 
 
 def show_main_menu():
