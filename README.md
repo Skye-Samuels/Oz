@@ -19,7 +19,7 @@ OZ runs as a **main program** that communicates with four independent **microser
 
 ## **🛠 Setup & Running Instructions**  
 
-### **1️⃣ Prerequisites**  
+### **1. Prerequisites**  
 Ensure you have the following installed:  
 - **Python 3.8+**  
 - **Flask** (_for microservices_)  
@@ -32,7 +32,7 @@ pip install -r requirements.txt
 
 ---
 
-### **2️⃣ Running OZ & Microservices**  
+### **2. Running OZ & Microservices**  
 
 1. To use OZ Assistant, start each microservice in a **separate terminal**:  
 
@@ -57,7 +57,7 @@ Ensure **all services are running** before using OZ.
 
 | Command | Description |
 |---------|------------|
-| 🔍 `search [query] [num]` | Search the web for [num] results. |
+| 🔍 `search [query] [num]` | Search the web for `[num]` results. |
 | 🕒 `history` | View your search history. |
 | 🌍 `open [number]` | Open a previous web search result by index. |
 | 📖 `define [word]` | Get the definition of a word. |
