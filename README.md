@@ -7,6 +7,7 @@ A powerful, terminal-based assistant integrating multiple microservices for enha
 
 ## **📌 Overview**  
 OZ Assistant is a command-line tool that allows users to:  
+
 ✅ **Search the Web** – Fetch search results from DuckDuckGo.  
 ✅ **Look Up Words** – Get word definitions, synonyms, and antonyms.  
 ✅ **Check Weather** – View current weather and forecasts.  
