@@ -154,8 +154,8 @@ def display_help():
                                🔒 PRIVACY NOTICE
     ────────────────────────────────────────────────────────────────────────────
 
-      ⚠️  Oz Assistant   DOES NOT   store search history beyond the current session.
-      ⚠️  Oz Assistant   DOES   store to-do list items between sessions.
+      ⚠️  Oz Assistant DOES NOT store search history beyond the current session.
+      ⚠️  Oz Assistant DOES store to-do list items between sessions.
 
     ╔══════════════════════════════════════════════════════════════════════════╗
     ║ Press Enter to return to the main menu...                                ║
