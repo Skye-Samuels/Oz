@@ -4,6 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 import urllib.parse
 import webbrowser
+import json
 
 WEB_BASE_URL = "https://www.duckduckgo.com"
 JOKE_BASE_URL = "http://localhost:8008"
@@ -22,6 +23,8 @@ def clear_screen():
 
 def print_banner():
 
+    # Source: https://patorjk.com/software/taag/
+
     banner = '''
 
         ██████╗ ███████╗    ██╗  ██╗███████╗██╗     ██████╗ ███████╗██████╗ 
@@ -38,7 +41,7 @@ def first_time_message():
     clear_screen()
     print("""
     ╔══════════════════════════════════════════════════════════════════════════╗
-    ║                  WELCOME TO OZ ASSISTANT                                 ║
+    ║                         WELCOME TO OZ ASSISTANT                          ║
     ║                                                                          ║
     ║ ✨ "Step into the wonderful world of Oz, where knowledge meets fantasy.  ║
     ║    Whether you're searching for wisdom, truth, or just a quick answer,   ║
@@ -59,49 +62,100 @@ def display_help():
     print_banner()
     print("""
     ╔══════════════════════════════════════════════════════════════════════════╗
-    ║                              HELP MENU                                   ║
+    ║                              📖 HELP MENU 📖                             ║
     ╚══════════════════════════════════════════════════════════════════════════╝
 
-       Oz Assistant is a text-based search tool for quick information access.   
+      ✨ Oz Assistant is a text-based search tool for quick information access.   
 
     ────────────────────────────────────────────────────────────────────────────
-                                   COMMANDS
+                               🔍 SEARCH COMMANDS
     ────────────────────────────────────────────────────────────────────────────
-    • help (or '?') : View available commands.
+      🆘  • help (or '?')                 
+           - View available commands.
+      
+      🔍  • search [query] [num]          
+           - Search the web using a query.
+           - [query]: The search term (e.g., "Python programming").
+           - [num]: Number of results (max 10, default 5).
 
-    • search [query] [num] : Search the web.
-             [query] : The search term (e.g., "Python programming").
-                     [num] : Number of results (max 10, default 5).
-    
-    • history : View your past searches.
-
-    • open [number] : Open a past search result.
-           [number] : The result index from history (e.g., "open 2").
-
-    • define [word] : Get the definition of a word.
-             [word] : Any valid English word.
-
-    • synonyms [word] : Get synonyms for a word.
-               [word] : Any valid English word.
-
-    • antonyms [word] : Get antonyms for a word.
-               [word] : Any valid English word.
-
-    • joke : Get a random joke.
-
-    • weather [location] : Get the current weather.
-              [location] : City or region name (e.g., "New York").
-
-    • forecast [location] : Get a 3-day weather forecast.
-               [location] : City or region name (e.g., "Los Angeles").
-
-    • back : Repeat the last command.
-
-    • exit (or 'q') : Close the application.
+      🕒  • history                       
+           - View your past searches.
+      
+      🌍  • open [number]                 
+           - Open a past search result.
+           - [number]: The index of a search result from history (e.g., "open 2").
 
     ────────────────────────────────────────────────────────────────────────────
-    PRIVACY NOTICE:
-    • Oz Assistant does NOT store search history beyond the current session.
+                               📖 DICTIONARY COMMANDS
+    ────────────────────────────────────────────────────────────────────────────
+      📖  • define [word]                 
+           - Get the definition of a word.
+           - [word]: Any valid English word.
+
+      🔄  • synonyms [word]               
+           - Get synonyms for a word.
+           - [word]: Any valid English word.
+
+      🚫  • antonyms [word]               
+           - Get antonyms for a word.
+           - [word]: Any valid English word.
+
+    ────────────────────────────────────────────────────────────────────────────
+                                  🎭 FUN COMMANDS
+    ────────────────────────────────────────────────────────────────────────────
+      😂  • joke                          
+           - Get a random joke.
+
+    ────────────────────────────────────────────────────────────────────────────
+                                 🌦 WEATHER COMMANDS
+    ────────────────────────────────────────────────────────────────────────────
+      🌦  • weather [location]            
+           - Get the current weather for a location.
+           - [location]: City or region name (e.g., "New York").
+
+      📅  • forecast [location]           
+           - Get a 3-day weather forecast.
+           - [location]: City or region name (e.g., "Los Angeles").
+
+    ────────────────────────────────────────────────────────────────────────────
+                               📋 TO-DO LIST COMMANDS
+    ────────────────────────────────────────────────────────────────────────────
+      📋  • view_tasks                    
+           - Display your To-Do list.
+
+      ➕  • add_task [task]               
+           - Add a new task to your To-Do list.
+           - [task]: Description of the task (e.g., "Buy groceries").
+
+      ✅  • complete_task [number]        
+           - Mark a task as completed.
+           - [number]: The ID of the task to complete (e.g., "complete_task 3").
+
+      ❌  • delete_task [number]          
+           - Remove a task by its ID.
+           - [number]: The ID of the task to remove (e.g., "delete_task 2").
+
+      🔥  • delete_all_tasks              
+           - Remove all tasks from the To-Do list.
+
+    ────────────────────────────────────────────────────────────────────────────
+                               ⚙️ SYSTEM COMMANDS
+    ────────────────────────────────────────────────────────────────────────────
+      🆘  • help (or '?')                 
+           - View this help menu.
+
+      ⏪  • back                          
+           - Repeat the last command.
+
+      🚪  • quit (or 'q')                 
+           - Close the application.
+
+    ────────────────────────────────────────────────────────────────────────────
+                               🔒 PRIVACY NOTICE
+    ────────────────────────────────────────────────────────────────────────────
+
+      ⚠️  Oz Assistant   DOES NOT   store search history beyond the current session.
+      ⚠️  Oz Assistant   DOES   store to-do list items between sessions.
 
     ╔══════════════════════════════════════════════════════════════════════════╗
     ║ Press Enter to return to the main menu...                                ║
@@ -173,7 +227,7 @@ def show_history():
     else:
         print("\n    🔍 Search History:\n")
         for idx, query in enumerate(search_history, 1):
-            print(f"    {idx}. {query}")
+            print(f"      {idx}. {query}")
     input('''
     ╔══════════════════════════════════════════════════════════════════════════╗
     ║ Press Enter to return to the main menu...                                ║
@@ -214,8 +268,8 @@ def fetch_random_joke():
         setup = joke_data.get("setup", "No setup available.")
         punchline = joke_data.get("punchline", "No punchline available.")
 
-        print(f"    🤡 {setup}\n")
-        print(f"    😂 {punchline}")
+        print(f"    🤡 {setup.replace("\n", "      \n")}\n")
+        print(f"    😂 {punchline.replace("\n", "      \n")}")
 
     except requests.exceptions.ConnectionError:
         print("    ❌ Unable to connect to the joke server.")
@@ -570,8 +624,8 @@ def get_antonyms(word):
 def add_task(task):
 
     global previous_command
-    
-    previous_command = f"add {task}"
+
+    previous_command = f"add task {task}"
 
     clear_screen()
     print_banner()
@@ -586,8 +640,7 @@ def add_task(task):
     try:
         response = requests.post(f"{TODO_BASE_URL}/todo/add", json={"task": task})
         response.raise_for_status()
-
-        print("    ✅ Task added successfully!\n")
+        print("    ✅ Task added successfully!")
 
     except requests.exceptions.ConnectionError:
         print("    ❌ Unable to connect to the To-Do service.")
@@ -605,39 +658,271 @@ def add_task(task):
         print(f"    ❌ An unexpected error occurred: {e}")
         print("    🔹 Please check your connection and try again.")
 
-    input("\n    🔹 Press Enter to return to the main menu...")
+    input('''
+    ╔══════════════════════════════════════════════════════════════════════════╗
+    ║ Press Enter to return to the main menu...                                ║
+    ╚══════════════════════════════════════════════════════════════════════════╝
+    ''')
+
+
+def view_tasks():
+
+    global previous_command
+
+    previous_command = "view_tasks"
+
+    clear_screen()
+    print_banner()
+    print("\n    ⏳ Retrieving your To-Do List...\n")
+
+    try:
+        response = requests.get(f"{TODO_BASE_URL}/todo/list", timeout=5)
+        response.raise_for_status()
+        data = response.json()
+
+        if not isinstance(data, dict) or "tasks" not in data:
+            print("    ❌ Error: Invalid response format. Expected a dictionary with a 'tasks' key.\n")
+        else:
+            tasks = data["tasks"]
+
+            print("    ╔══════════════════════════════════════════════════════════════════════════╗")
+            print("    ║                               📝 TO-DO LIST                              ║")
+            print("    ╚══════════════════════════════════════════════════════════════════════════╝\n")
+
+            if not tasks:
+                print("    🎉 No tasks found! You're all caught up!")
+            else:
+                print("    ╔═══════════╦═════════════════════════════════════════════════════╦════════╗")
+                print("    ║    ID     ║                        TASK                         ║ STATUS ║")
+                print("    ╠═══════════╬═════════════════════════════════════════════════════╬════════╣")
+
+                for task in tasks:
+                    task_id = f"{task['id']}".center(9)  
+                    task_name = task['task'].center(51)  
+                    status = "✅" if task["completed"] else "❌"
+                    status = status.center(5)
+
+                    print(f"    ║ {task_id} ║ {task_name} ║ {status} ║")
+
+                print("    ╚═══════════╩═════════════════════════════════════════════════════╩════════╝")
+
+    except requests.exceptions.ConnectionError:
+        print("    ❌ Unable to connect to the To-Do service.")
+        print("    🔹 Please ensure the service is running on port 8011.")
+
+    except requests.exceptions.Timeout:
+        print("    ❌ The request timed out.")
+        print("    🔹 The To-Do service is taking too long to respond. Try again later.")
+
+    except requests.exceptions.HTTPError as http_err:
+        print(f"    ❌ HTTP Error: {http_err}")
+        print("    🔹 The To-Do service might be experiencing issues.")
+
+    except requests.RequestException as e:
+        print(f"    ❌ An unexpected error occurred: {e}")
+        print("    🔹 Please check your connection and try again.")
+    
+    input('''
+    ╔══════════════════════════════════════════════════════════════════════════╗
+    ║ Press Enter to return to the main menu...                                ║
+    ╚══════════════════════════════════════════════════════════════════════════╝
+    ''')
+
+
+def delete_task(task_number):
+
+    global previous_command
+
+    previous_command = f"delete {task_number}"
+
+    clear_screen()
+    print_banner()
+
+    if not task_number.isdigit():
+        print("\n    ❌ Error: Task number must be a valid integer.\n")
+        input("    🔹 Press Enter to return to the main menu...")
+        return
+
+    print(f"\n    ⏳ Removing task #{task_number}...\n")
+
+    try:
+        response = requests.delete(f"{TODO_BASE_URL}/todo/delete/{task_number}", timeout=5)
+        response.raise_for_status()
+        response_data = response.json()
+
+        if "message" in response_data and "deleted" in response_data["message"].lower():
+            print("    ✅ Task deleted successfully!")
+        elif response_data.get("success") is True or response_data.get("message") == "Task deleted successfully":
+            print("    ✅ Task deleted successfully!")
+        else:
+            print("    ❌ Task not found or could not be deleted.")
+
+    except requests.exceptions.HTTPError as http_err:
+        if response.status_code == 404:
+            print(f"    ❌ Error: Task #{task_number} not found.")
+            print("    🔹 Please check the task number and try again.")
+        else:
+            print(f"    ❌ HTTP Error: {http_err}")
+            print("    🔹 The To-Do service might be experiencing issues.")
+
+    except requests.exceptions.ConnectionError:
+        print("    ❌ Unable to connect to the To-Do service.")
+        print("    🔹 Please ensure the service is running on port 8011.")
+
+    except requests.exceptions.Timeout:
+        print("    ❌ The request timed out.")
+        print("    🔹 The To-Do service is taking too long to respond. Try again later.")
+
+    except requests.RequestException as e:
+        print(f"    ❌ An unexpected error occurred: {e}")
+        print("    🔹 Please check your connection and try again.")
+
+    input('''
+    ╔══════════════════════════════════════════════════════════════════════════╗
+    ║ Press Enter to return to the main menu...                                ║
+    ╚══════════════════════════════════════════════════════════════════════════╝
+    ''')
+
+
+def delete_all_tasks():
+
+    global previous_command
+
+    previous_command = "delete_all_tasks"
+
+    clear_screen()
+    print_banner()
+    print("\n    ⏳ Deleting all tasks from the To-Do list...\n")
+
+    try:
+        response = requests.delete(f"{TODO_BASE_URL}/todo/delete_all", timeout=5)
+        response.raise_for_status()
+        response_data = response.json()
+
+        if "message" in response_data:
+            print(f"    ✅ {response_data['message']}")
+        else:
+            print("    ❌ Unexpected error: No confirmation message received.")
+
+    except requests.exceptions.ConnectionError:
+        print("    ❌ Unable to connect to the To-Do service.")
+        print("    🔹 Please ensure the service is running on port 8011.")
+
+    except requests.exceptions.Timeout:
+        print("    ❌ The request timed out.")
+        print("    🔹 The To-Do service is taking too long to respond. Try again later.")
+
+    except requests.exceptions.HTTPError as http_err:
+        print(f"    ❌ HTTP Error: {http_err}")
+        print("    🔹 The To-Do service might be experiencing issues.")
+
+    except requests.RequestException as e:
+        print(f"    ❌ An unexpected error occurred: {e}")
+        print("    🔹 Please check your connection and try again.")
+
+    input('''
+    ╔══════════════════════════════════════════════════════════════════════════╗
+    ║ Press Enter to return to the main menu...                                ║
+    ╚══════════════════════════════════════════════════════════════════════════╝
+    ''')
+
+
+def complete_task(task_number):
+
+    global previous_command
+
+    previous_command = f"complete_task {task_number}"
+
+    clear_screen()
+    print_banner()
+
+    if not task_number.isdigit():
+        print("\n    ❌ Error: Task number must be a valid integer.\n")
+        input("    🔹 Press Enter to return to the main menu...")
+        return
+
+    print(f"\n    ⏳ Marking task #{task_number} as complete...\n")
+
+    try:
+        response = requests.put(f"{TODO_BASE_URL}/todo/complete/{task_number}", timeout=5)
+        response.raise_for_status()
+        response_data = response.json()
+
+        if "message" in response_data:
+            print(f"    ✅ {response_data['message']}")
+        else:
+            print("    ❌ Unexpected error: No confirmation message received.")
+
+    except requests.exceptions.HTTPError as http_err:
+        if response.status_code == 404:
+            print(f"    ❌ Error: Task #{task_number} not found.")
+            print("    🔹 Please check the task number and try again.")
+        else:
+            print(f"    ❌ HTTP Error: {http_err}")
+            print("    🔹 The To-Do service might be experiencing issues.")
+
+    except requests.exceptions.ConnectionError:
+        print("    ❌ Unable to connect to the To-Do service.")
+        print("    🔹 Please ensure the service is running on port 8011.")
+
+    except requests.exceptions.Timeout:
+        print("    ❌ The request timed out.")
+        print("    🔹 The To-Do service is taking too long to respond. Try again later.")
+
+    except requests.RequestException as e:
+        print(f"    ❌ An unexpected error occurred: {e}")
+        print("    🔹 Please check your connection and try again.")
+
+    input('''
+    ╔══════════════════════════════════════════════════════════════════════════╗
+    ║ Press Enter to return to the main menu...                                ║
+    ╚══════════════════════════════════════════════════════════════════════════╝
+    ''')
 
 
 def show_main_menu():
-
-    clear_screen()
     
+    clear_screen()
     print_banner()
 
     print("""
     ╔══════════════════════════════════════════════════════════════════════════╗
-    ║                              MAIN MENU                                   ║
+    ║                              🌟 MAIN MENU 🌟                             ║
     ╚══════════════════════════════════════════════════════════════════════════╝
     
-    Welcome to Oz! Your personal assistant for fast information retrieval.
+       Welcome to Oz! Your personal assistant for fast information retrieval.
 
     ────────────────────────────────────────────────────────────────────────────
-                              AVAILABLE COMMANDS
+                              📌 AVAILABLE COMMANDS
     ────────────────────────────────────────────────────────────────────────────
-    
-    • Type 'help' (or '?')        ─ View instructions and available commands.
-    • Type 'search [query] [num]' ─ Search the web for [num] search results.
-    • Type 'history'              ─ View your search history.
-    • Type 'open [number]'        ─ Simulate opening a link.
-    • Type 'define [word]'        ─ Get the definition of a word.
-    • Type 'synonyms [word]'      ─ Get synonyms for a word.
-    • Type 'antonyms [word]'      ─ Get antonyms for a word.
-    • Type 'joke'                 ─ Get a random joke from an external service.
-    • Type 'weather [location]'   ─ Get the current weather for a location.
-    • Type 'forecast [location]'  ─ Get a 3-day weather forecast.
-    • Type 'back'                 ─ Repeat the last command.
-    • Type 'exit' (or 'q')        ─ Close the application.
 
+      🔍  Type 'search [query] [num]'   ─ Search the web for [num] results.
+      🕒  Type 'history'                ─ View your search history.
+      🌍  Type 'open [number]'          ─ Open a previous web search.
+
+      📖  Type 'define [word]'          ─ Get the definition of a word.
+      🔄  Type 'synonyms [word]'        ─ Get synonyms for a word.
+      🚫  Type 'antonyms [word]'        ─ Get antonyms for a word.
+
+      🎭  Type 'joke'                   ─ Get a random joke.
+      
+      🌦  Type 'weather [location]'     ─ Get the current weather for a location.
+      📅  Type 'forecast [location]'    ─ Get a 3-day weather forecast.
+  
+      📋  Type 'view_tasks'             ─ Display your To-Do list.
+      ➕  Type 'add_task [task]'        ─ Add a new task to your To-Do list.
+      ✅  Type 'complete_task [number]' ─ Mark a task as completed.
+      ❌  Type 'delete_task [number]'   ─ Remove a task by its ID number.
+      🔥  Type 'delete_all_tasks'       ─ Remove all tasks from the To-Do list.
+
+    ────────────────────────────────────────────────────────────────────────────
+                              ⚙️ SYSTEM COMMANDS
+    ────────────────────────────────────────────────────────────────────────────
+
+      ⏪  Type 'back'                   ─ Repeat the last command.
+      ❓  Type 'help' (or '?')          ─ View commands and command arguments.
+      🚪  Type 'quit' (or 'q')          ─ Close the application.
+  
     ╔══════════════════════════════════════════════════════════════════════════╗
     ║ Type your command below:                                                 ║
     ╚══════════════════════════════════════════════════════════════════════════╝
@@ -648,63 +933,110 @@ def handle_command(user_input):
 
     global previous_command
 
-    if user_input == "help" or user_input == "?":
+    if not user_input.strip():
+        return
+
+    user_input = user_input.lower()
+    command, _, argument = user_input.partition(" ")
+
+    if command in ["help", "?"]:
         display_help()
-    elif user_input.startswith("search "):
+
+    elif command == "search":
         previous_command = user_input
-        parts = user_input.split(" ")
-        search_query = " ".join(parts[1:])
+        parts = argument.rsplit(" ", 1)
         num_results = 5
-        if search_query.split()[-1].isdigit():
-            num_results = int(search_query.split()[-1])
-            search_query = " ".join(search_query.split()[:-1])
-        search_web(search_query, num_results)
-    elif user_input == "back":
+
+        if parts[-1].isdigit():
+            num_results = int(parts[-1])
+            search_query = " ".join(parts[:-1])
+        else:
+            search_query = argument
+
+        if search_query:
+            search_web(search_query, num_results)
+        else:
+            input("    ⚠️ Please provide a search query. Example: search Python programming 5")
+
+    elif command == "back":
         if previous_command and previous_command != "back":
             handle_command(previous_command)
         else:
             input("    ⚠️ No previous command to repeat.")
-    elif user_input == "history":
+
+    elif command == "history":
         show_history()
-    elif user_input.startswith("open "):
-        number = user_input.split()[1]
-        open_link(number)
-    elif user_input == "joke":
+
+    elif command == "open":
+        if argument.isdigit():
+            open_link(argument)
+        else:
+            input("    ⚠️ Please specify a valid number. Example: open 2")
+
+    elif command == "joke":
         fetch_random_joke()
-    elif user_input.startswith("weather "):
-        location = user_input.split(" ", 1)[1] if len(user_input.split(" ", 1)) > 1 else ""
-        if location:
-            fetch_current_weather(location)
+
+    elif command == "weather":
+        if argument:
+            fetch_current_weather(argument)
         else:
             input("    ⚠️ Please specify a location. Example: weather London")
-    elif user_input.startswith("forecast "):
-        location = user_input.split(" ", 1)[1] if len(user_input.split(" ", 1)) > 1 else ""
-        if location:
-            fetch_weather_forecast(location)
+
+    elif command == "forecast":
+        if argument:
+            fetch_weather_forecast(argument)
         else:
             input("    ⚠️ Please specify a location. Example: forecast London")
-    elif user_input.startswith("define "):
-        word = user_input.split(" ", 1)[1] if len(user_input.split(" ", 1)) > 1 else ""
-        if word:
-            define_word(word)
+
+    elif command == "define":
+        if argument:
+            define_word(argument)
         else:
             input("    ⚠️ Please specify a word. Example: define test")
-    elif user_input.startswith("synonyms "):
-        word = user_input.split(" ", 1)[1] if len(user_input.split(" ", 1)) > 1 else ""
-        if word:
-            get_synonyms(word)
+
+    elif command == "synonyms":
+        if argument:
+            get_synonyms(argument)
         else:
             input("    ⚠️ Please specify a word. Example: synonyms happy")
-    elif user_input.startswith("antonyms "):
-        word = user_input.split(" ", 1)[1] if len(user_input.split(" ", 1)) > 1 else ""
-        if word:
-            get_antonyms(word)
+
+    elif command == "antonyms":
+        if argument:
+            get_antonyms(argument)
         else:
             input("    ⚠️ Please specify a word. Example: antonyms good")
-    elif user_input == "exit" or user_input == "q":
+
+    elif command == "add_task":
+        if argument:
+            add_task(argument)
+        else:
+            input("    ⚠️ Please specify a task. Example: add_task Buy groceries")
+
+    elif command == "view_tasks":
+        view_tasks()
+
+    elif command == "delete_task":
+
+        if argument.isdigit():
+            delete_task(argument)
+        else:
+            input("    ⚠️ Please specify a valid task number. Example: delete_task 2")
+
+    elif command == "delete_all_tasks":
+        delete_all_tasks()
+
+    elif command == "complete_task":
+        if argument.isdigit():
+            complete_task(argument)
+        else:
+            input("    ⚠️ Please specify a valid task number. Example: complete_task 2")
+
+
+    elif command in ["exit", "e", "quit", "q"]:
         confirm = input("\n    ❓ Are you sure you want to exit? (yes/no): ").strip().lower()
         if confirm in ["yes", "y"]:
             sys.exit("\n    🔹 Goodbye!\n")
+
     else:
         input("    ⚠️ Invalid command. Type 'help' for a list of commands.")
 
