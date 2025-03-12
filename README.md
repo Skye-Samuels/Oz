@@ -57,19 +57,23 @@ Ensure **all services are running** before using OZ.
 
 | Command | Description |
 |---------|------------|
-| `search [query] [num]` | Search the web for [num] results. |
-| `define [word]` | Get the definition of a word. |
-| `synonyms [word]` | Fetch synonyms for a word. |
-| `antonyms [word]` | Fetch antonyms for a word. |
-| `weather [location]` | Get the current weather. |
-| `forecast [location]` | Get a 3-day weather forecast. |
-| `joke` | Get a random joke. |
-| `add_task [task]` | Add a new task to your To-Do list. |
-| `view_tasks` | Display all tasks. |
-| `complete_task [id]` | Mark a task as completed. |
-| `delete_task [id]` | Remove a task by its ID. |
-| `help` | View all available commands. |
-| `quit` | Exit the assistant. |
+| 🔍 `search [query] [num]` | Search the web for [num] results. |
+| 🕒 `history` | View your search history. |
+| 🌍 `open [number]` | Open a previous web search result by index. |
+| 📖 `define [word]` | Get the definition of a word. |
+| 🔄 `synonyms [word]` | Fetch synonyms for a word. |
+| 🚫 `antonyms [word]` | Fetch antonyms for a word. |
+| 🎭 `joke` | Get a random joke. |
+| 🌦 `weather [location]` | Get the current weather for a location. |
+| 📅 `forecast [location]` | Get a 3-day weather forecast. |
+| 📋 `view_tasks` | Display all tasks in your To-Do list. |
+| ➕ `add_task [task]` | Add a new task to your To-Do list. |
+| ✅ `complete_task [number]` | Mark a task as completed. |
+| ❌ `delete_task [number]` | Remove a task by its ID number. |
+| 🔥 `delete_all_tasks` | Remove all tasks from the To-Do list. |
+| ⏪ `back` | Repeat the last command. |
+| ❓ `help` (or `?`) | View available commands and arguments. |
+| 🚪 `quit` (or `q`) | Exit the program. |
 
 ---
 
